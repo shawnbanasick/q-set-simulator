@@ -6,11 +6,11 @@ export function getCriticalValue(n: number): number {
   if (n <= 2) throw new Error("n must be > 2");
 
   const df = n - 2;
-  const alpha = 0.05;
+  // const alpha = 0.05;
 
   // Step 1: Get the critical T-value for alpha 0.05 (two-tailed)
   // This uses the Hill's algorithm approximation for t-inverse
-  const t = calculateTValue(df, alpha);
+  const t = calculateTValue(df);
 
   // Step 2: Convert T to R
   // Formula: r = sqrt( t^2 / (t^2 + df) )
@@ -24,7 +24,7 @@ export function getCriticalValue(n: number): number {
  * High-accuracy approximation of the Inverse T-Distribution
  * Specifically tuned for the 0.05 (two-tailed) significance level.
  */
-function calculateTValue(df: number, alpha: number): number {
+function calculateTValue(df: number): number {
   // Common critical values for small df to ensure 100% accuracy
   const exactValues: Record<number, number> = {
     1: 12.706,

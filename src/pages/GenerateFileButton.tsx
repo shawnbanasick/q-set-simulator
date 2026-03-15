@@ -3,6 +3,9 @@ import { calculateSortableArray } from "./calculateSortableArray";
 import getPqmethodCorrelation from "./calcPearsonCorrels";
 import _ from "lodash";
 import JSZip from "jszip";
+import { getDateTime } from "./getDateTime";
+import createPqmethodDat from "./createPqmethodDat";
+import { t } from "i18next";
 
 export default function GenerateFileButton() {
   const { pattern, patternValues, loopArray } = useAppStore();
@@ -89,10 +92,25 @@ export default function GenerateFileButton() {
       return textFile;
     };
 
+    // create PQMethod files
+
+    const projectName = getDateTime();
+    const pqDatFile = createPqmethodDat(
+      [...masterArray],
+      [...pattern],
+      projectName,
+      masterArray[0].length,
+    );
+    // console.log(pqDatFile);
+
+    const statementsFile = statementsTextFile(masterArray);
+
     const zip = new JSZip();
     zip.file("sorts.txt", sortsTextFile(masterArray));
     zip.file("names.txt", "test");
-    zip.file("statements.txt", statementsTextFile(masterArray));
+    zip.file("statements.txt", statementsFile);
+    zip.file(`${projectName}.STA`, statementsFile);
+    zip.file(`${projectName}.DAT`, pqDatFile);
     zip.file("pattern.txt", pattern.join(","));
     zip.generateAsync({ type: "blob" }).then((content) => {
       const element = document.createElement("a");

@@ -1,7 +1,18 @@
 import { useState, useRef, useCallback } from "react";
 
+interface PatternInputProps {
+  controlledValue?: number;
+  defaultValue?: number;
+  min?: number;
+  max?: number;
+  step?: number;
+  label?: string;
+  disabled?: boolean;
+  onChange?: (value: number) => void;
+}
+
 function PatternInput({
-  value: controlledValue,
+  controlledValue,
   defaultValue = 0,
   min = -Infinity,
   max = Infinity,
@@ -9,19 +20,19 @@ function PatternInput({
   label,
   disabled = false,
   onChange,
-}) {
+}: PatternInputProps) {
   const [internalValue, setInternalValue] = useState(defaultValue);
   const [focused, setFocused] = useState(false);
   const [inputStr, setInputStr] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const intervalRef = useRef(null);
-  const timeoutRef = useRef(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const value = controlledValue ?? internalValue;
-  const clamp = (v) => Math.min(max, Math.max(min, v));
+  const clamp = (v: number) => Math.min(max, Math.max(min, v));
 
   const setValue = useCallback(
-    (v) => {
+    (v: number | ((prev: number) => number)) => {
       const raw = typeof v === "function" ? v(value) : v;
       const clamped = clamp(Math.round(raw / step) * step);
       if (controlledValue === undefined) setInternalValue(clamped);
@@ -30,7 +41,7 @@ function PatternInput({
     [controlledValue, min, max, step, onChange, value],
   );
 
-  const startContinuous = (dir) => {
+  const startContinuous = (dir: "up" | "down") => {
     setValue(value + (dir === "up" ? step : -step));
     timeoutRef.current = setTimeout(() => {
       intervalRef.current = setInterval(() => {
@@ -40,8 +51,8 @@ function PatternInput({
   };
 
   const stopContinuous = () => {
-    clearTimeout(timeoutRef.current);
-    clearInterval(intervalRef.current);
+    clearTimeout(timeoutRef.current ?? undefined);
+    clearInterval(intervalRef.current ?? undefined);
   };
 
   const commitInput = () => {
@@ -210,7 +221,7 @@ export default function App() {
     CHANNEL_LABELS.map(() => Math.floor(Math.random() * 80) + 10),
   );
 
-  const update = (i, v) =>
+  const update = (i: number, v: number) =>
     setValues((prev) => {
       const next = [...prev];
       next[i] = v;
@@ -224,14 +235,13 @@ export default function App() {
         <p className="text-slate-400 text-xs font-mono mt-0.5">20 inputs · compact light mode</p>
       </div>
 
-      {/* The row of 20 */}
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4 overflow-x-auto">
         <div className="flex gap-2 min-w-max">
           {CHANNEL_LABELS.map((label, i) => (
             <PatternInput
               key={label}
               label={label}
-              value={values[i]}
+              controlledValue={values[i]}
               onChange={(v) => update(i, v)}
               min={0}
               max={127}
@@ -240,7 +250,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* Summary */}
       <div className="flex gap-4 text-xs font-mono text-slate-400">
         <span>min: {Math.min(...values)}</span>
         <span>max: {Math.max(...values)}</span>
