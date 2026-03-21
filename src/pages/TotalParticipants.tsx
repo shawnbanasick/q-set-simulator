@@ -87,8 +87,11 @@ export default function TotalParticipants() {
   ]);
 
   return (
-    <div className="flex flex-wrap justify-center items-center w-[600px]">
-      {`P1: ${factor1Participants}, P2: ${factor2Participants}, P3: ${factor3Participants}, P4: ${factor4Participants}, P5: ${factor5Participants}, Total: ${TotalParticipants}`}
+    <div className="flex flex-wrap flex-row gap-6 justify-center items-center w-[600px]">
+      <div>{`P1: ${factor1Participants}`}</div> <div> {`P2: ${factor2Participants}`}</div>{" "}
+      <div> {`P3: ${factor3Participants}`}</div>
+      <div>{`P4: ${factor4Participants}`}</div> <div>{`P5: ${factor5Participants}`}</div>{" "}
+      <div>{`Total: ${TotalParticipants} participants`}</div>
     </div>
   );
 }

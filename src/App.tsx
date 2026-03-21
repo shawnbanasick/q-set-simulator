@@ -15,6 +15,8 @@ import Factor4Card from "./pages/Factor4Card";
 import Factor5Card from "./pages/Factor5Card";
 import TotalParticipants from "./pages/TotalParticipants";
 import GenerateFileButton from "./pages/GenerateFileButton";
+import Toggle from "./pages/Toggle";
+import StrengthSelects from "./pages/StrengthSelects";
 
 export default function App() {
   //   const { t, i18n } = useTranslation();
@@ -51,21 +53,25 @@ export default function App() {
             </div>
           </div>
         </div>
-        <div className="mt-10 border-2 border-green-500">
+        <div className="mt-10">
           <TotalStatements />
         </div>
-        <div className="w-[800px] border-2 border-green-500">
-          <UserTextInput />
-        </div>
-        <div className="flex flex-row mt-5 w-[800px] border-2 border-green-500">
+        <div className="flex flex-row mt-5 w-[1000px]">
           <Factor1Card />
           <Factor2Card />
           <Factor3Card />
           <Factor4Card />
           <Factor5Card />
+          <div className="flex flex-col">
+            <Toggle />
+            <StrengthSelects />
+          </div>
         </div>
-        <div className="flex flex-row mt-5 items-center justify-center w-[800px] border-2 border-green-500">
+        <div className="flex flex-row mt-5 items-center justify-center w-[800px]">
           <TotalParticipants />
+        </div>
+        <div id="filenameInput" className="w-[800px] mt-4">
+          <UserTextInput />
         </div>
         <GenerateFileButton />
       </div>

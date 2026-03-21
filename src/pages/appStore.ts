@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
+export type StrengthOption = "very close" | "close" | "far" | "very far" | "random" | "";
+
 interface AppState {
   count: number;
   card1Cutoff1: number;
@@ -28,11 +30,20 @@ interface AppState {
   card5Cutoff3: number;
   card5Cutoff4: number;
   card5Cutoff5: number;
+  isOn: boolean;
   loopArray: number[][];
   pattern: number[];
   patternValues: number[];
   sortableArray: number[];
   filename: string;
+  p1p2Strength: StrengthOption;
+  p2p3Strength: StrengthOption;
+  p3p4Strength: StrengthOption;
+  p4p5Strength: StrengthOption;
+  updateP1P2Strength: (val: StrengthOption) => void;
+  updateP2P3Strength: (val: StrengthOption) => void;
+  updateP3P4Strength: (val: StrengthOption) => void;
+  updateP4P5Strength: (val: StrengthOption) => void;
   updateFilename: (filename: string) => void;
   updatePattern: (pattern: number[]) => void;
   updateSortableArray: (sortableArray: number[]) => void;
@@ -62,6 +73,7 @@ interface AppState {
   updateCard5Cutoff4: (card5Cutoff4: number) => void;
   updateCard5Cutoff5: (card5Cutoff5: number) => void;
   updateLoopArray: (loopArray: number[][]) => void;
+  toggleIsOn: (isOn: boolean) => void;
   increment: () => void;
   decrement: () => void;
   reset: () => void;
@@ -128,6 +140,16 @@ export const useAppStore = create<AppState>()(
           "12",
           "13",
         ],
+        isOn: false,
+        p1p2Strength: "",
+        p2p3Strength: "",
+        p3p4Strength: "",
+        p4p5Strength: "",
+        updateP1P2Strength: (val) => set({ p1p2Strength: val }),
+        updateP2P3Strength: (val) => set({ p2p3Strength: val }),
+        updateP3P4Strength: (val) => set({ p3p4Strength: val }),
+        updateP4P5Strength: (val) => set({ p4p5Strength: val }),
+        toggleIsOn: () => set((s) => ({ isOn: !s.isOn }) as Partial<AppState>),
         updateFilename: (filename: string) => set(() => ({ filename })),
         updatePattern: (pattern: number[]) => set(() => ({ pattern })),
         updateSortableArray: (sortableArray: number[]) => set(() => ({ sortableArray })),
