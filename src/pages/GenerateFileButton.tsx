@@ -1,12 +1,13 @@
 import { useAppStore } from "./appStore";
 import { calculateSortableArray } from "./calculateSortableArray";
-import _ from "lodash";
+// import _ from "lodash";
 import JSZip from "jszip";
 import { getDateTime } from "./getDateTime";
 import createPqmethodDat from "./createPqmethodDat";
 // import { t } from "i18next";
 import doArraySwap from "./doArraySwap";
 import calcSeedSorts from "./calcSeedSorts";
+// import doLimitedArraySwap from "./doLimitedArraySwap";
 
 export default function GenerateFileButton() {
   const {
@@ -25,57 +26,79 @@ export default function GenerateFileButton() {
   console.log("p1p2", p1p2Strength);
 
   const cutoffsArray: [number, number][] = [
-    [0.7, 0.9],
-    [0.5, 0.7],
-    [0.3, 0.5],
-    [0.1, 0.3],
-    [0.01, 0.1],
+    [0.9, 1.0],
+    [0.8, 0.89],
+    [0.7, 0.79],
+    [0.6, 0.69],
+    [0.5, 0.59],
+    [0.4, 0.49],
+    [0.3, 0.39],
+    [0.2, 0.29],
+    [0.1, 0.19],
+    [0.01, 0.09],
   ];
-  // loopArray = [[1,1,1,1,1], [1,1,1,1,1], [1,1,1,1,1], [1,1,1,1,1], [1,1,1,1,1]]
 
   const generateFile = () => {
     console.log(JSON.stringify(loopArray));
-    console.log("clicked");
     const sortableArray = calculateSortableArray(pattern, patternValues);
     const masterArray: number[][] = [];
 
+    const arrayOfSeeds = calcSeedSorts(
+      [...sortableArray],
+      p1p2Strength,
+      p2p3Strength,
+      p3p4Strength,
+      p4p5Strength,
+    );
+
     // Iterate through 5 Perspectives data arrays
-    for (let i = 0; i < loopArray.length; i++) {
-      const arrayOfSeeds = calcSeedSorts(
-        [...sortableArray],
-        p1p2Strength,
-        p2p3Strength,
-        p3p4Strength,
-        p4p5Strength,
-      );
+    // for each perspective, iterate to get appropriate number of arrays of each level to produce
+    for (let j = 0; j < 5; j++) {
+      // get seed arrays
+      const seedArray1 = [...arrayOfSeeds[j]];
+      let seedArray2: number[] = [];
+      if (j > 0) {
+        seedArray2 = [...arrayOfSeeds[j - 1]];
+      }
 
-      console.log("seed", JSON.stringify(arrayOfSeeds.length));
-
-      // const seedArray1: number[] = _.shuffle([...sortableArray]);
-      const seedArray1 = [...arrayOfSeeds[i]];
-
+      // include seedArray in output?
       if (isOn) {
         masterArray.push(seedArray1);
       }
-
       console.log("seedArray1", seedArray1);
       console.log("masterArray", masterArray);
       console.log(loopArray);
-      const perspectives = loopArray[i];
-      if (!perspectives) continue;
-      // [0, 0, 3, 3, 0]
 
-      // for each perspective, iterate to get appropriate number of arrays to produce
-      for (let j = 0; j < 5; j++) {
+      // get number of participants at each level for this perspective
+      const perspectives = loopArray[j]; // example = [0, 0, 3, 3, 0, 0, 0, 0, 0, 0]
+      // error check
+      if (!perspectives) continue;
+
+      let newArray: number[];
+
+      // iterate through perspective levels
+      for (let i = 0; i < 10; i++) {
+        const numPartThisLevel = loopArray[j][i];
         const cutoffs = cutoffsArray[i];
 
-        console.log("loopArray", loopArray[j][i]);
+        if (numPartThisLevel > 0) {
+          console.log("cutoffs", cutoffs);
+          for (let k = 0; k < numPartThisLevel; k++) {
+            console.log("what", seedArray2.length, j);
+            // if (seedArray2.length === 0) {
+            //   newArray = doArraySwap(seedArray1, cutoffs[0], cutoffs[1]);
+            // } else {
+            //   newArray = doLimitedArraySwap(
+            //     seedArray1,
+            //     cutoffs[0],
+            //     cutoffs[1],
+            //     seedArray2,
+            //     0.1,
+            //     0.3,
+            //   );
+            // }
+            newArray = doArraySwap(seedArray1, cutoffs[0], cutoffs[1]);
 
-        const comparisonValue = loopArray[j][i];
-        if (comparisonValue > 0) {
-          console.log("values", j, i, comparisonValue, cutoffs[0], cutoffs[1]);
-          for (let k = 0; k < comparisonValue; k++) {
-            const newArray: number[] = doArraySwap(seedArray1, cutoffs[0], cutoffs[1]);
             masterArray.push(newArray);
             console.log("pushed", k);
           }
@@ -87,6 +110,43 @@ export default function GenerateFileButton() {
       let textFile = "";
       for (let i = 0; i < masterArray.length; i++) {
         textFile += `Part_${i + 1}` + "," + masterArray[i].join(",") + "\n";
+      }
+      return textFile;
+    };
+
+    const stataDataFile = (masterArray: number[][]) => {
+      console.log("masterArray", JSON.stringify(masterArray));
+      const transposedArray: (number | string)[][] = [];
+      for (let i = 0; i < masterArray[0].length; i++) {
+        const newRow: (number | string)[] = [];
+        for (let j = 0; j < masterArray.length; j++) {
+          newRow.push(masterArray[j][i]);
+        }
+        transposedArray.push(newRow);
+      }
+
+      for (let i = 0; i < transposedArray.length; i++) {
+        transposedArray[i].push("statement" + (i + 1));
+        transposedArray[i].unshift(i + 1);
+      }
+
+      const headerRow = [
+        "StatNo",
+        ...transposedArray[0].slice(1, -1).map((_, i) => `p${i + 1}`),
+        "statement",
+      ];
+
+      transposedArray.unshift(headerRow);
+
+      let textFile = "";
+      for (let i = 0; i < transposedArray.length; i++) {
+        for (let j = 0; j < transposedArray[i].length; j++) {
+          if (j === transposedArray[i].length - 1) {
+            textFile += transposedArray[i][j] + "\n";
+          } else {
+            textFile += transposedArray[i][j] + ",";
+          }
+        }
       }
       return textFile;
     };
@@ -115,10 +175,13 @@ export default function GenerateFileButton() {
 
     const statementsFile = statementsTextFile(masterArray);
 
+    const stataDataFileText = stataDataFile(masterArray);
+
     const zip = new JSZip();
     zip.file("sorts.txt", sortsTextFile(masterArray));
     zip.file("names.txt", "test");
     zip.file("statements.txt", statementsFile);
+    zip.file(`${projectName}_stata_data.csv`, stataDataFileText);
     zip.file(`${projectName}.STA`, statementsFile);
     zip.file(`${projectName}.DAT`, pqDatFile);
     zip.file("pattern.txt", pattern.join(",") + "\n");
@@ -133,7 +196,7 @@ export default function GenerateFileButton() {
   };
 
   return (
-    <div className="flex flex-wrap justify-center items-center bg-gray-300 hover:bg-gray-500 h-[50px] mt-10 w-[300px]">
+    <div className="flex flex-wrap justify-center items-center bg-gray-300 hover:bg-gray-500 hover:text-white h-[50px] mt-10 w-[300px] rounded-md">
       <button onClick={generateFile}>Generate File</button>
     </div>
   );

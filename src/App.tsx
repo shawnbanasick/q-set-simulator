@@ -17,10 +17,18 @@ import TotalParticipants from "./pages/TotalParticipants";
 import GenerateFileButton from "./pages/GenerateFileButton";
 import Toggle from "./pages/Toggle";
 import StrengthSelects from "./pages/StrengthSelects";
+import ClearAllButton from "./pages/ClearAllButton";
+import ClearPer1 from "./pages/ClearPer1";
+import ClearPer2 from "./pages/ClearPer2";
+import ClearPer3 from "./pages/ClearPer3";
+import ClearPer4 from "./pages/ClearPer4";
+import ClearPer5 from "./pages/ClearPer5";
 
 export default function App() {
   //   const { t, i18n } = useTranslation();
   const { pattern, labelArray } = useAppStore();
+  console.log(pattern);
+  console.log(pattern.length);
   const updatePattern = useAppStore((state) => state.updatePattern);
   const label = labelArray;
 
@@ -32,7 +40,7 @@ export default function App() {
 
   return (
     <>
-      <div id="appDiv" className="flex flex-col  justify-center items-center h-screen">
+      <div id="appDiv" className="flex flex-col  justify-center items-center mt-10 mb-10">
         <h1 className="text-3xl font-bold">Q Sort Simulator</h1>
         <div id="decideLableDiv" className="flex w-[80%] mt-10 justify-center items-center gap-2">
           Decide Q Sort Pattern and Number of Statements
@@ -65,6 +73,12 @@ export default function App() {
           <div className="flex flex-col">
             <Toggle />
             <StrengthSelects />
+            <ClearPer1 />
+            <ClearPer2 />
+            <ClearPer3 />
+            <ClearPer4 />
+            <ClearPer5 />
+            <ClearAllButton />
           </div>
         </div>
         <div className="flex flex-row mt-5 items-center justify-center w-[800px]">
