@@ -1,11 +1,7 @@
 import "./App.scss";
-// import { useTranslation } from "react-i18next";
-// import { useAppStore } from "./pages/appStore";
 import NumberInput from "./pages/NumberInput";
 import { useAppStore } from "./pages/appStore";
 import TotalStatements from "./pages/TotalStatements";
-// import { calculateSortableArray } from "./pages/calculateSortableArray";
-// import getPqmethodCorrelation from "./pages/calcPearsonCorrels";
 import * as _ from "lodash";
 import UserTextInput from "./pages/UserTextInput";
 import Factor1Card from "./pages/Factor1Card";
@@ -27,8 +23,6 @@ import ClearPer5 from "./pages/ClearPer5";
 export default function App() {
   //   const { t, i18n } = useTranslation();
   const { pattern, labelArray } = useAppStore();
-  console.log(pattern);
-  console.log(pattern.length);
   const updatePattern = useAppStore((state) => state.updatePattern);
   const label = labelArray;
 
@@ -40,9 +34,15 @@ export default function App() {
 
   return (
     <>
-      <div id="appDiv" className="flex flex-col  justify-center items-center mt-10 mb-10">
+      <div
+        id="appDiv"
+        className="flex flex-col  justify-center items-center mt-10 mb-10"
+      >
         <h1 className="text-3xl font-bold">Q Sort Simulator</h1>
-        <div id="decideLableDiv" className="flex w-[80%] mt-10 justify-center items-center gap-2">
+        <div
+          id="decideLableDiv"
+          className="flex w-[80%] mt-10 justify-center items-center gap-2"
+        >
           Decide Q Sort Pattern and Number of Statements
         </div>
         <div className="flex flex-wrap w-[80%]">
@@ -81,10 +81,10 @@ export default function App() {
             <ClearAllButton />
           </div>
         </div>
-        <div className="flex flex-row mt-5 items-center justify-center w-[800px]">
+        <div className="flex flex-row mt-5 items-center justify-center w-200">
           <TotalParticipants />
         </div>
-        <div id="filenameInput" className="w-[800px] mt-4">
+        <div id="filenameInput" className="w-200 mt-4">
           <UserTextInput />
         </div>
         <GenerateFileButton />

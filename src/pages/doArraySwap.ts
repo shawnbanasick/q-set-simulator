@@ -21,7 +21,6 @@ export default function generateCorrelatedPermutation(
   minCorr: number = 0.7,
   maxCorr: number = 0.9,
 ): number[] {
-  console.log(minCorr, maxCorr);
   const current = [...original];
   const n = current.length;
   let iterations = 0;
@@ -31,7 +30,6 @@ export default function generateCorrelatedPermutation(
     const currCorr = getCorrelation(original, current);
 
     if (currCorr >= minCorr && currCorr <= maxCorr) {
-      console.log("currCorr", currCorr);
       break;
     }
 
@@ -42,20 +40,14 @@ export default function generateCorrelatedPermutation(
     const newCorr = getCorrelation(original, current);
 
     if (currCorr > maxCorr) {
-      if (newCorr > currCorr) [current[i], current[j]] = [current[j], current[i]];
+      if (newCorr > currCorr)
+        [current[i], current[j]] = [current[j], current[i]];
     } else if (currCorr < minCorr) {
-      if (newCorr < currCorr) [current[i], current[j]] = [current[j], current[i]];
+      if (newCorr < currCorr)
+        [current[i], current[j]] = [current[j], current[i]];
     }
 
     iterations++;
   }
-  console.log(iterations);
   return current;
 }
-// Example:
-// const original = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-// const correlated = generateCorrelatedPermutation(original, 0.7, 0.9);
-
-// console.log("Original:", original);
-// console.log("Correlated Permutation:", correlated);
-// console.log("Actual Correlation:", getCorrelation(original, correlated).toFixed(3));

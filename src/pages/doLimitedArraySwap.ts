@@ -31,7 +31,6 @@ export default function generateCorrelatedPermutation(
   refMinCorr: number = 0.1,
   refMaxCorr: number = 0.3,
 ): number[] {
-  console.log(minCorr, maxCorr, refMinCorr, refMaxCorr);
   const current = [...original];
   const n = current.length;
   let iterations = 0;
@@ -67,7 +66,5 @@ export default function generateCorrelatedPermutation(
 
     iterations++;
   }
-
-  console.log(iterations);
   return current;
 }
