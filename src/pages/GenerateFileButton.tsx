@@ -6,6 +6,7 @@ import createPqmethodDat from "./createPqmethodDat";
 import doArraySwap from "./doArraySwap";
 import calcSeedSorts from "./calcSeedSorts";
 import ExcelJS from "exceljs";
+import { toast } from "sonner";
 
 export default function GenerateFileButton() {
   const {
@@ -33,7 +34,10 @@ export default function GenerateFileButton() {
     [0.01, 0.09],
   ];
 
+  const total = loopArray.flat().reduce((a, b) => a + b, 0) + (isOn ? 5 : 0);
+
   const generateFile = async () => {
+    if (total === 0) return;
     const sortableArray = calculateSortableArray(pattern, patternValues);
     const masterArray: number[][] = [];
 
@@ -253,13 +257,26 @@ export default function GenerateFileButton() {
       element.download = `${filename}-${projectName}-SIM-26.zip`;
       document.body.appendChild(element);
       element.click();
+      toast.success("File generated");
       document.body.removeChild(element);
     });
   };
 
   return (
-    <div className="flex flex-wrap justify-center items-center bg-gray-300 hover:bg-gray-500 hover:text-white h-12.5 mt-10 w-75 rounded-md">
-      <button onClick={generateFile}>Generate File</button>
+    <div>
+      <button
+        type="button"
+        onClick={generateFile}
+        disabled={total === 0}
+        className="w-full rounded-lg bg-teal-700 px-5 py-3 font-semibold text-white shadow-sm transition-colors hover:bg-teal-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600"
+      >
+        Generate file
+      </button>
+      {total === 0 && (
+        <p className="mt-2 text-sm text-slate-600">
+          Add participants in step 2 or include seed sorts to enable export.
+        </p>
+      )}
     </div>
   );
 }

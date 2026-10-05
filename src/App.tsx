@@ -1,94 +1,120 @@
-import "./App.scss";
 import NumberInput from "./pages/NumberInput";
-import { useAppStore } from "./pages/appStore";
-import TotalStatements from "./pages/TotalStatements";
-import * as _ from "lodash";
-import UserTextInput from "./pages/UserTextInput";
-import Factor1Card from "./pages/Factor1Card";
-import Factor2Card from "./pages/Factor2Card";
-import Factor3Card from "./pages/Factor3Card";
-import Factor4Card from "./pages/Factor4Card";
-import Factor5Card from "./pages/Factor5Card";
-import TotalParticipants from "./pages/TotalParticipants";
-import GenerateFileButton from "./pages/GenerateFileButton";
-import Toggle from "./pages/Toggle";
+import { useAppStore, PERSPECTIVES } from "./pages/appStore";
+import { getCriticalValue } from "./pages/getCriticalValue";
+import FactorCard from "./pages/FactorCard";
 import StrengthSelects from "./pages/StrengthSelects";
-import ClearAllButton from "./pages/ClearAllButton";
-import ClearPer1 from "./pages/ClearPer1";
-import ClearPer2 from "./pages/ClearPer2";
-import ClearPer3 from "./pages/ClearPer3";
-import ClearPer4 from "./pages/ClearPer4";
-import ClearPer5 from "./pages/ClearPer5";
+import Toggle from "./pages/Toggle";
+import UserTextInput from "./pages/UserTextInput";
+import GenerateFileButton from "./pages/GenerateFileButton";
+import { Section, StatTile } from "./pages/Section";
 
 export default function App() {
-  //   const { t, i18n } = useTranslation();
-  const { pattern, labelArray } = useAppStore();
-  const updatePattern = useAppStore((state) => state.updatePattern);
-  const label = labelArray;
+  const pattern = useAppStore((s) => s.pattern);
+  const labelArray = useAppStore((s) => s.labelArray);
+  const loopArray = useAppStore((s) => s.loopArray);
+  const isOn = useAppStore((s) => s.isOn);
+  const updatePattern = useAppStore((s) => s.updatePattern);
+  const clearAll = useAppStore((s) => s.clearAllPerspectives);
 
-  const handleChange = (val: number, i: number) => {
-    const newPattern = [...pattern];
-    newPattern[i] = val;
-    updatePattern(newPattern);
+  const statements = pattern.reduce((a, b) => a + b, 0);
+  const criticalValue = getCriticalValue(statements);
+  const simulated = loopArray.flat().reduce((a, b) => a + b, 0);
+  const seeds = isOn ? PERSPECTIVES : 0;
+
+  const handlePatternChange = (val: number, i: number) => {
+    const next = [...pattern];
+    next[i] = val;
+    updatePattern(next);
   };
 
   return (
-    <>
-      <div
-        id="appDiv"
-        className="flex flex-col  justify-center items-center mt-10 mb-10"
-      >
-        <h1 className="text-3xl font-bold">Q Sort Simulator</h1>
-        <div
-          id="decideLableDiv"
-          className="flex w-[80%] mt-10 justify-center items-center gap-2"
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      <div className="mx-auto max-w-6xl space-y-6 px-4 py-10">
+        <header>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Q Sort Simulator
+          </h1>
+          <p className="mt-1 max-w-prose text-slate-600">
+            Generate simulated Q sort data for PQMethod, Excel and Stata.
+          </p>
+        </header>
+
+        <Section
+          step={1}
+          title="Q sort pattern"
+          hint="Set how many statements go in each column of the distribution."
         >
-          Decide Q Sort Pattern and Number of Statements
-        </div>
-        <div className="flex flex-wrap w-[80%]">
-          <div className="flex flex-wrap bg-white border border-slate-200 rounded-xl shadow-sm p-2 overflow-x-auto">
-            <div className="flex gap-2 min-w-max">
+          <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white p-2">
+            <div className="flex min-w-max gap-2">
               {pattern.map((value, i) => (
                 <NumberInput
                   key={i}
-                  label={label[i]}
+                  label={labelArray[i]}
                   value={value}
-                  onChange={(val) => handleChange(val, i)}
+                  onChange={(val) => handlePatternChange(val, i)}
                   min={0}
                   max={127}
                 />
               ))}
             </div>
           </div>
-        </div>
-        <div className="mt-10">
-          <TotalStatements />
-        </div>
-        <div className="flex flex-row mt-5 w-[1000px]">
-          <Factor1Card />
-          <Factor2Card />
-          <Factor3Card />
-          <Factor4Card />
-          <Factor5Card />
-          <div className="flex flex-col">
-            <Toggle />
-            <StrengthSelects />
-            <ClearPer1 />
-            <ClearPer2 />
-            <ClearPer3 />
-            <ClearPer4 />
-            <ClearPer5 />
-            <ClearAllButton />
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <StatTile label="Total statements" value={statements} />
+            <StatTile
+              label="Significant correlation cutoff"
+              value={criticalValue}
+            />
           </div>
+        </Section>
+
+        <Section
+          step={2}
+          title="Participants per perspective"
+          hint="Choose how many simulated participants correlate with each perspective at each strength."
+          action={
+            <button
+              type="button"
+              onClick={clearAll}
+              disabled={simulated === 0}
+              className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-teal-700 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Clear all
+            </button>
+          }
+        >
+          {/* <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"> */}
+          <div className="flex flex-wrap gap-3">
+            {Array.from({ length: PERSPECTIVES }, (_, p) => (
+              <FactorCard key={p} index={p} />
+            ))}
+          </div>
+        </Section>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Section
+            step={3}
+            title="Perspective relationships"
+            hint="Set how similar neighbouring perspectives are to each other."
+          >
+            <div className="space-y-6">
+              <StrengthSelects />
+              <Toggle />
+            </div>
+          </Section>
+
+          <Section step={4} title="Export">
+            <div className="space-y-5">
+              <div className="grid grid-cols-3 gap-3">
+                <StatTile label="Simulated" value={simulated} />
+                <StatTile label="Seeds" value={seeds} />
+                <StatTile label="Total" value={simulated + seeds} />
+              </div>
+              <UserTextInput />
+              <GenerateFileButton />
+            </div>
+          </Section>
         </div>
-        <div className="flex flex-row mt-5 items-center justify-center w-200">
-          <TotalParticipants />
-        </div>
-        <div id="filenameInput" className="w-200 mt-4">
-          <UserTextInput />
-        </div>
-        <GenerateFileButton />
       </div>
-    </>
+    </div>
   );
 }

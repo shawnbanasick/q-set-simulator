@@ -68,11 +68,7 @@ export default function NumberInput({
     <div
       className={`flex flex-col w-[75px] items-center gap-px min-w-0 ${disabled ? "opacity-40" : ""}`}
     >
-      {label && (
-        <span className="text-[8px] sm:text-[12px] font-semibold tracking-wider uppercase text-slate-400 select-none truncate max-w-full px-0.5 text-center leading-tight">
-          {label}
-        </span>
-      )}
+      {label && <span className="">{label}</span>}
 
       <div
         className={[
@@ -89,10 +85,7 @@ export default function NumberInput({
           onMouseDown={() => !disabled && !atMin && startContinuous("down")}
           onMouseUp={stopContinuous}
           onMouseLeave={stopContinuous}
-          onTouchStart={(e) => {
-            e.preventDefault();
-            !disabled && !atMin && startContinuous("down");
-          }}
+          onTouchStart={() => !disabled && !atMin && startContinuous("down")}
           onTouchEnd={stopContinuous}
           className={[
             "flex items-center justify-center shrink-0 bg-white text-slate-400",
@@ -176,10 +169,7 @@ export default function NumberInput({
           onMouseDown={() => !disabled && !atMax && startContinuous("up")}
           onMouseUp={stopContinuous}
           onMouseLeave={stopContinuous}
-          onTouchStart={(e) => {
-            e.preventDefault();
-            !disabled && !atMax && startContinuous("up");
-          }}
+          onTouchStart={(e) => !disabled && !atMax && startContinuous("up")}
           onTouchEnd={stopContinuous}
           className={[
             "flex items-center justify-center shrink-0 bg-white text-slate-400",

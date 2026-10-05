@@ -1,56 +1,79 @@
-import React from "react";
 import { useAppStore, type StrengthOption } from "./appStore";
 
-const STRENGTH_OPTIONS: StrengthOption[] = ["very close", "close", "far", "very far", "random"];
+const OPTIONS: StrengthOption[] = [
+  "very close",
+  "close",
+  "far",
+  "very far",
+  "random",
+];
 
-// --- Reusable Select Component ---
-interface StrengthSelectProps {
+function StrengthSelect({
+  id,
+  label,
+  value,
+  onChange,
+}: {
+  id: string;
   label: string;
   value: StrengthOption;
   onChange: (val: StrengthOption) => void;
-}
-
-const StrengthSelect: React.FC<StrengthSelectProps> = ({ label, value, onChange }) => (
-  <div className="flex flex-col gap-1 ml-4">
-    <label className="text-xs font-semibold tracking-wide text-gray-600 uppercase">{label}</label>
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value as StrengthOption)}
-      className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
-    >
-      <option value="" disabled>
-        Select distance…
-      </option>
-      {STRENGTH_OPTIONS.map((opt) => (
-        <option key={opt} value={opt}>
-          {opt.charAt(0).toUpperCase() + opt.slice(1)}
-        </option>
-      ))}
-    </select>
-  </div>
-);
-
-// --- Composed Component ---
-export const StrengthSelects: React.FC = () => {
-  const {
-    p1p2Strength,
-    p2p3Strength,
-    p3p4Strength,
-    p4p5Strength,
-    updateP1P2Strength,
-    updateP2P3Strength,
-    updateP3P4Strength,
-    updateP4P5Strength,
-  } = useAppStore();
-
+}) {
   return (
-    <div className="flex flex-col gap-2">
-      <StrengthSelect label="P1-P2" value={p1p2Strength} onChange={updateP1P2Strength} />
-      <StrengthSelect label="P2-P3" value={p2p3Strength} onChange={updateP2P3Strength} />
-      <StrengthSelect label="P3-P4" value={p3p4Strength} onChange={updateP3P4Strength} />
-      <StrengthSelect label="P4-P5" value={p4p5Strength} onChange={updateP4P5Strength} />
+    <div>
+      <label
+        htmlFor={id}
+        className="mb-1 block text-sm font-medium text-slate-700"
+      >
+        {label}
+      </label>
+      <select
+        id={id}
+        value={value}
+        onChange={(e) => onChange(e.target.value as StrengthOption)}
+        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-700/30"
+      >
+        <option value="" disabled>
+          Select distance
+        </option>
+        {OPTIONS.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt.charAt(0).toUpperCase() + opt.slice(1)}
+          </option>
+        ))}
+      </select>
     </div>
   );
-};
+}
 
-export default StrengthSelects;
+export default function StrengthSelects() {
+  const s = useAppStore();
+  return (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <StrengthSelect
+        id="p12"
+        label="Perspective 1 and 2"
+        value={s.p1p2Strength}
+        onChange={s.updateP1P2Strength}
+      />
+      <StrengthSelect
+        id="p23"
+        label="Perspective 2 and 3"
+        value={s.p2p3Strength}
+        onChange={s.updateP2P3Strength}
+      />
+      <StrengthSelect
+        id="p34"
+        label="Perspective 3 and 4"
+        value={s.p3p4Strength}
+        onChange={s.updateP3P4Strength}
+      />
+      <StrengthSelect
+        id="p45"
+        label="Perspective 4 and 5"
+        value={s.p4p5Strength}
+        onChange={s.updateP4P5Strength}
+      />
+    </div>
+  );
+}

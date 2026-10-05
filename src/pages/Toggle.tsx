@@ -1,30 +1,35 @@
 import { useAppStore } from "./appStore";
-import React from "react";
 
-export const Toggle: React.FC = () => {
-  const { isOn, toggleIsOn } = useAppStore();
+export default function Toggle() {
+  const isOn = useAppStore((s) => s.isOn);
+  const toggleIsOn = useAppStore((s) => s.toggleIsOn);
 
   return (
-    <div className="flex flex-col items-center gap-3 font-mono mb-4">
-      <span className="w-[150px] text-center text-xs font-semibold tracking-widest text-gray-700 transition-colors duration-200">
-        {isOn ? "Seed Included" : "Seed Not Included"}
-      </span>
+    <div className="flex items-start gap-3">
       <button
+        type="button"
         role="switch"
+        id="seed-toggle"
         aria-checked={isOn}
-        onClick={() => toggleIsOn(isOn)}
-        className={`relative inline-flex h-7 w-16 cursor-pointer items-center rounded-full border-none px-1 outline-none transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
-          isOn ? "bg-gradient-to-br from-teal-400 to-blue-500" : "bg-gray-300"
+        onClick={toggleIsOn}
+        className={`relative mt-0.5 inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 ${
+          isOn ? "bg-teal-700" : "bg-slate-300"
         }`}
       >
         <span
-          className={`h-5 w-7 shrink-0 rounded-full bg-white shadow-md transition-transform duration-300 ${
-            isOn ? "translate-x-7 shadow-blue-400/60" : "translate-x-0 shadow-black/20"
+          className={`h-5 w-5 rounded-full bg-white shadow transition-transform ${
+            isOn ? "translate-x-[22px]" : "translate-x-0.5"
           }`}
         />
       </button>
+      <label htmlFor="seed-toggle" className="cursor-pointer">
+        <div className="text-sm font-medium text-slate-900">
+          Include seed sorts
+        </div>
+        <div className="text-sm text-slate-600">
+          Adds the 5 original perspective sorts to the output file.
+        </div>
+      </label>
     </div>
   );
-};
-
-export default Toggle;
+}
