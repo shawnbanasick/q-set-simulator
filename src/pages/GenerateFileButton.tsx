@@ -91,7 +91,7 @@ export default function GenerateFileButton(props: { characteristics: any }) {
     console.log(numValuesToChange, "numValuesToChange");
     console.log(numUnforcedSorts, "numUnforcedSorts");
 
-    let characteristicsFile = `Number of Statements: ${statements}\n Critical Value: ${criticalValue}\n Pattern: ${pattern.join(",")}\nFilename: ${filename}\n Number of Simulated Sorts: ${simulated}\nIncluded Seed Sorts: ${isOn}\n Number of Unforced Sorts: ${numUnforcedSorts}\nNumber of Values to Change in Each Unforced Sort: ${numValuesToChange}\nInclude Unforced Sorts: ${isUnforcedOn}\n`;
+    let characteristicsFile = `Filename: ${filename}\nNumber of Statements: ${statements}\nCritical Value: ${criticalValue}\nPattern: ${pattern.join(",")}\nNumber of Simulated Sorts: ${simulated}\nIncluded Seed Sorts: ${isOn}\n\nInclude Unforced Sorts: ${isUnforcedOn}\nNumber of Unforced Sorts: ${numUnforcedSorts}\nNumber of Values to Change in Each Unforced Sort: ${numValuesToChange}\n`;
 
     let changesRecords = [];
     // let unforcedChangesTextFile = "";
@@ -290,6 +290,7 @@ export default function GenerateFileButton(props: { characteristics: any }) {
     }
 
     const zip = new JSZip();
+    zip.file("characteristics.txt", characteristicsFile);
     zip.file("sorts.txt", textSorts);
     zip.file("names.txt", projectName);
     zip.file("statements.txt", statementsFile);
