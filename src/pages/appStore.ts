@@ -27,22 +27,30 @@ interface AppState {
   /** loopArray[perspective][band] = number of participants. Same name GenerateFileButton already reads. */
   loopArray: number[][];
   isOn: boolean;
+  isUnforcedOn: boolean;
   filename: string;
   p1p2Strength: StrengthOption;
   p2p3Strength: StrengthOption;
   p3p4Strength: StrengthOption;
   p4p5Strength: StrengthOption;
+  numUnforcedSorts: number;
+  numValuesToChange: number;
+  shouldIncludeUnforcedSorts: boolean;
 
   updatePattern: (pattern: number[]) => void;
   updateCutoff: (perspective: number, band: number, value: number) => void;
   clearPerspective: (perspective: number) => void;
   clearAllPerspectives: () => void;
   toggleIsOn: () => void;
+  toggleIsUnforcedOn: () => void;
   updateFilename: (filename: string) => void;
   updateP1P2Strength: (val: StrengthOption) => void;
   updateP2P3Strength: (val: StrengthOption) => void;
   updateP3P4Strength: (val: StrengthOption) => void;
   updateP4P5Strength: (val: StrengthOption) => void;
+  updateNumUnforcedSorts: (val: number) => void;
+  updateNumValuesToChange: (val: number) => void;
+  updateShouldIncludeUnforcedSorts: (val: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -61,7 +69,10 @@ export const useAppStore = create<AppState>()(
         p2p3Strength: "",
         p3p4Strength: "",
         p4p5Strength: "",
-
+        numUnforcedSorts: 5,
+        numValuesToChange: 2,
+        shouldIncludeUnforcedSorts: false,
+        isUnforcedOn: false,
         updatePattern: (pattern) => set({ pattern }),
         updateCutoff: (perspective, band, value) =>
           set((s) => ({
@@ -79,11 +90,18 @@ export const useAppStore = create<AppState>()(
           })),
         clearAllPerspectives: () => set({ loopArray: emptyGrid() }),
         toggleIsOn: () => set((s) => ({ isOn: !s.isOn })),
+        toggleIsUnforcedOn: () =>
+          set((s) => ({ isUnforcedOn: !s.isUnforcedOn })),
         updateFilename: (filename) => set({ filename }),
         updateP1P2Strength: (p1p2Strength) => set({ p1p2Strength }),
         updateP2P3Strength: (p2p3Strength) => set({ p2p3Strength }),
         updateP3P4Strength: (p3p4Strength) => set({ p3p4Strength }),
         updateP4P5Strength: (p4p5Strength) => set({ p4p5Strength }),
+        updateNumUnforcedSorts: (numUnforcedSorts) => set({ numUnforcedSorts }),
+        updateNumValuesToChange: (numValuesToChange) =>
+          set({ numValuesToChange }),
+        updateShouldIncludeUnforcedSorts: (shouldIncludeUnforcedSorts) =>
+          set({ shouldIncludeUnforcedSorts }),
       }),
       {
         name: "app-storage",
@@ -97,6 +115,12 @@ export const useAppStore = create<AppState>()(
           p2p3Strength: persisted?.p2p3Strength ?? "",
           p3p4Strength: persisted?.p3p4Strength ?? "",
           p4p5Strength: persisted?.p4p5Strength ?? "",
+          numUnforcedSorts: persisted?.numUnforcedSorts ?? 5,
+          numValuesToChange: persisted?.numValuesToChange ?? 2,
+          shouldIncludeUnforcedSorts:
+            persisted?.shouldIncludeUnforcedSorts ?? false,
+          labelArray: persisted?.labelArray ?? [],
+          patternValues: persisted?.patternValues ?? [],
           loopArray: isValidGrid(persisted?.loopArray)
             ? persisted.loopArray
             : emptyGrid(),

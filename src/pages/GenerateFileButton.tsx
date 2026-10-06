@@ -7,8 +7,9 @@ import doArraySwap from "./doArraySwap";
 import calcSeedSorts from "./calcSeedSorts";
 import ExcelJS from "exceljs";
 import { toast } from "sonner";
+import { createUnforcedSorts } from "./createUnforcedSorts";
 
-export default function GenerateFileButton() {
+export default function GenerateFileButton(props: { characteristics: any }) {
   const {
     pattern,
     patternValues,
@@ -19,7 +20,14 @@ export default function GenerateFileButton() {
     p2p3Strength,
     p3p4Strength,
     p4p5Strength,
+    numUnforcedSorts,
+    numValuesToChange,
+    isUnforcedOn,
   } = useAppStore();
+
+  console.log(props.characteristics, "props.characteristics");
+
+  const { criticalValue, statements, simulated } = props.characteristics;
 
   const cutoffsArray: [number, number][] = [
     [0.9, 1.0],
@@ -39,7 +47,10 @@ export default function GenerateFileButton() {
   const generateFile = async () => {
     if (total === 0) return;
     const sortableArray = calculateSortableArray(pattern, patternValues);
-    const masterArray: number[][] = [];
+    let masterArray: number[][] = [];
+
+    console.log("num values to change", numValuesToChange);
+    console.log("num forced sorts", numUnforcedSorts);
 
     const arrayOfSeeds = calcSeedSorts(
       [...sortableArray],
@@ -74,6 +85,37 @@ export default function GenerateFileButton() {
         }
       }
     }
+
+    // console.log("masterArray", JSON.stringify(masterArray));
+    console.log(isUnforcedOn, "isUnforcedOn");
+    console.log(numValuesToChange, "numValuesToChange");
+    console.log(numUnforcedSorts, "numUnforcedSorts");
+
+    let characteristicsFile = `Number of Statements: ${statements}\n Critical Value: ${criticalValue}\n Pattern: ${pattern.join(",")}\nFilename: ${filename}\n Number of Simulated Sorts: ${simulated}\nIncluded Seed Sorts: ${isOn}\n Number of Unforced Sorts: ${numUnforcedSorts}\nNumber of Values to Change in Each Unforced Sort: ${numValuesToChange}\nInclude Unforced Sorts: ${isUnforcedOn}\n`;
+
+    let changesRecords = [];
+    // let unforcedChangesTextFile = "";
+    if (isUnforcedOn) {
+      const { result, changes } = createUnforcedSorts(
+        masterArray,
+        numValuesToChange,
+        numUnforcedSorts,
+      );
+
+      masterArray = [...result];
+      // console.log("changes", JSON.stringify(changes, null, 2));
+      changesRecords = [...changes];
+
+      // unforcedChangesTextFile += "RowIndex, Index,  OldValue,  NewValue\n";
+      for (const change of changesRecords) {
+        console.log("change", change, null, 2);
+        for (const item of change.changes) {
+          characteristicsFile += `Participant ${change.rowIndex + 1},  Value Index: ${item.index + 1}, Old Value: ${item.oldValue},  New Value:  ${item.newValue}\n`;
+        }
+      }
+    }
+
+    console.log(characteristicsFile, "characteristicsFile");
 
     const sortsTextFile = async (masterArray: number[][]) => {
       let textFileKade = "";
@@ -240,6 +282,13 @@ export default function GenerateFileButton() {
     const stataDataFileText = await stataDataFile(masterArray);
     const textSorts = await sortsTextFile(masterArray);
 
+    let downloadName;
+    if (isUnforcedOn) {
+      downloadName = `${filename}-${projectName}-SIM-26-unforced.zip`;
+    } else {
+      downloadName = `${filename}-${projectName}-SIM-26`;
+    }
+
     const zip = new JSZip();
     zip.file("sorts.txt", textSorts);
     zip.file("names.txt", projectName);
@@ -254,7 +303,7 @@ export default function GenerateFileButton() {
     zip.generateAsync({ type: "blob" }).then((content) => {
       const element = document.createElement("a");
       element.href = URL.createObjectURL(content);
-      element.download = `${filename}-${projectName}-SIM-26.zip`;
+      element.download = downloadName;
       document.body.appendChild(element);
       element.click();
       toast.success("File generated");

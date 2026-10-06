@@ -2,11 +2,12 @@ import NumberInput from "./pages/NumberInput";
 import { useAppStore, PERSPECTIVES } from "./pages/appStore";
 import { getCriticalValue } from "./pages/getCriticalValue";
 import FactorCard from "./pages/FactorCard";
-import StrengthSelects from "./pages/StrengthSelects";
+// import StrengthSelects from "./pages/StrengthSelects";
 import Toggle from "./pages/Toggle";
 import UserTextInput from "./pages/UserTextInput";
 import GenerateFileButton from "./pages/GenerateFileButton";
 import { Section, StatTile } from "./pages/Section";
+import ForcedUnforced from "./pages/ForcedUnforced";
 
 export default function App() {
   const pattern = useAppStore((s) => s.pattern);
@@ -27,6 +28,13 @@ export default function App() {
     updatePattern(next);
   };
 
+  const propsObject = {
+    pattern,
+    statements,
+    criticalValue,
+    simulated,
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto max-w-6xl space-y-6 px-4 py-10">
@@ -35,7 +43,7 @@ export default function App() {
             Q Sort Simulator
           </h1>
           <p className="mt-1 max-w-prose text-slate-600">
-            Generate simulated Q sort data for PQMethod, Excel and Stata.
+            Generate simulated Q sort data for KADE and PQMethod.
           </p>
         </header>
 
@@ -61,7 +69,7 @@ export default function App() {
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <StatTile label="Total statements" value={statements} />
             <StatTile
-              label="Significant correlation cutoff"
+              label="Significant correlation threshold"
               value={criticalValue}
             />
           </div>
@@ -93,12 +101,17 @@ export default function App() {
         <div className="grid gap-6 lg:grid-cols-2">
           <Section
             step={3}
-            title="Perspective relationships"
-            hint="Set how similar neighbouring perspectives are to each other."
+            title="Q Sort Modifications"
+            hint="Create unforced sorts or add seed sorts to the simulation."
           >
             <div className="space-y-6">
-              <StrengthSelects />
-              <Toggle />
+              {/* <StrengthSelects /> */}
+              <ForcedUnforced />
+
+              <Toggle
+                text1="Include seed sorts"
+                text2="Adds the 5 original perspective sorts to the output file."
+              />
             </div>
           </Section>
 
@@ -110,7 +123,7 @@ export default function App() {
                 <StatTile label="Total" value={simulated + seeds} />
               </div>
               <UserTextInput />
-              <GenerateFileButton />
+              <GenerateFileButton characteristics={propsObject} />
             </div>
           </Section>
         </div>
