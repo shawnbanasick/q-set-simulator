@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect, useId } from "react";
-import { useAppStore, type number } from "./appStore";
+import { useAppStore } from "./appStore";
 
 interface NumberInputProps {
   value?: number;

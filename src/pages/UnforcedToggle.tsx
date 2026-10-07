@@ -1,7 +1,6 @@
 import { useAppStore } from "./appStore";
 
 export default function Toggle(text: { text1: string; text2?: string }) {
-  const s = useAppStore();
   const isUnforcedOn = useAppStore((s) => s.isUnforcedOn);
   const toggleIsUnforcedOn = useAppStore((s) => s.toggleIsUnforcedOn);
 

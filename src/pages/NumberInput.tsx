@@ -169,7 +169,7 @@ export default function NumberInput({
           onMouseDown={() => !disabled && !atMax && startContinuous("up")}
           onMouseUp={stopContinuous}
           onMouseLeave={stopContinuous}
-          onTouchStart={(e) => !disabled && !atMax && startContinuous("up")}
+          onTouchStart={() => !disabled && !atMax && startContinuous("up")}
           onTouchEnd={stopContinuous}
           className={[
             "flex items-center justify-center shrink-0 bg-white text-slate-400",
