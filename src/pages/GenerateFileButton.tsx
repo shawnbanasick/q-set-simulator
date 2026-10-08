@@ -125,6 +125,21 @@ export default function GenerateFileButton(props: { characteristics: any }) {
       return textFileKade;
     };
 
+    const sortsTextFileWithHeader = async (masterArray: number[][]) => {
+      let textFileKade = "Part.,";
+      for (let i = 0; i < masterArray[0].length; i++) {
+        textFileKade += `s${i + 1}`;
+        if (i < masterArray[0].length - 1) {
+          textFileKade += ",";
+        }
+      }
+      textFileKade += "\n";
+      for (let i = 0; i < masterArray.length; i++) {
+        textFileKade += `Part_${i + 1}` + "," + masterArray[i].join(",") + "\n";
+      }
+      return textFileKade;
+    };
+
     const stataDataFile = async (masterArray: number[][]) => {
       const transposedArray: (number | string)[][] = [];
       for (let i = 0; i < masterArray[0].length; i++) {
@@ -281,6 +296,7 @@ export default function GenerateFileButton(props: { characteristics: any }) {
     const statementsFile = await statementsTextFile(masterArray);
     const stataDataFileText = await stataDataFile(masterArray);
     const textSorts = await sortsTextFile(masterArray);
+    const csvTextSorts = await sortsTextFileWithHeader(masterArray);
 
     let downloadName;
     if (isUnforcedOn) {
@@ -295,7 +311,7 @@ export default function GenerateFileButton(props: { characteristics: any }) {
     zip.file("names.txt", projectName);
     zip.file("statements.txt", statementsFile);
     zip.file(`${projectName}_stata_data.csv`, stataDataFileText);
-    zip.file(`${projectName}_csv_data.csv`, textSorts);
+    zip.file(`${projectName}_csv_data.csv`, csvTextSorts);
     zip.file(`${projectName}-Type1.xlsx`, await createExcelFile());
     zip.file(`${projectName}-Type2.xlsx`, await createExcelFileType2());
     zip.file(`${projectName}.STA`, statementsFile);
